@@ -1,0 +1,492 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign type = section.settings.type
+  assign enable_logo_link = section.settings.enable_logo_link
+  assign logo_default = section.settings.logo_default
+  assign logo_inverted = section.settings.logo_inverted
+  assign logo_mobile = section.settings.logo_mobile
+  assign logo_width_desktop = section.settings.logo_width_desktop
+  assign logo_width_mobile = section.settings.logo_width_mobile
+-%}
+
+<style>
+  .header[data-section-id='{{ section.id }}'] .header__logo {
+      max-width: {{ logo_width_desktop }}px;
+  }
+
+  .header[data-section-id='{{ section.id }}'] .header__logo.header__logo--mobile {
+      max-width: {{ logo_width_mobile }}px;
+  }
+  
+ {%- if template contains 'index' -%}
+header {
+  background-color: transparent;
+  position: fixed;
+  width: 100%;
+  margin-bottom: 8px; 
+}
+.header:hover {
+   background-color:white;
+}
+header.scrolled:hover {
+   background-color:white;
+}
+.header .header-menu__link {
+  color: white;
+}
+.header:hover .header-menu__link {
+  color: black;
+}
+.header.scrolled .header-menu__link {
+  color: black;
+}
+.header.scrolled:hover .header-menu__link {
+  color: black;
+}
+/* Replace '.site-header.scrolled' with the CSS selector for your header element with the 'scrolled' class */
+.header.scrolled {
+  background-color:white;
+  position: fixed;
+  width: 100%;
+  margin-bottom: 8px;
+} 
+    }
+  {%- else -%}
+    /* Other pages */
+    /* .header[data-section-id='{{ section.id }}'] .header__menu-container .header-menu__link {
+      color: black; 
+    } */
+   header {
+  background-color: transparent;
+  position: fixed;
+  width: 100%;
+      color: black; 
+     
+  margin-bottom: 8px; 
+}
+.header:hover {
+   background-color:white;
+}
+header.scrolled:hover {
+   background-color:white;
+}
+.header .header-menu__link {
+  color: black;
+}
+.header:hover .header-menu__link {
+  color: black;
+}
+.header.scrolled .header-menu__link {
+  color: black;
+}
+.header.scrolled:hover .header-menu__link {
+  color: black;
+}
+/* Replace '.site-header.scrolled' with the CSS selector for your header element with the 'scrolled' class */
+.header.scrolled {
+  background-color:white;
+  position: fixed;
+  width: 100%;
+  margin-bottom: 8px;
+}
+  {%- endif -%}
+  /* Replace '.site-header' with the CSS selector for your header element */
+/* .header {
+  /* Styles for the default logo */
+  /* background-color:black; */
+} */
+
+
+
+  /*------ added by developer--------*/
+
+</style>
+
+<script>
+
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    var header = document.querySelector('.header');
+
+    window.addEventListener('scroll', function() {
+      // Add your logic to change the logo based on scroll position
+      if (window.pageYOffset > 4) {
+        // Change the logo when scrolled down
+        header.classList.add('scrolled');
+      } else {
+        // Reset the logo to the original when scrolled back to the top
+        header.classList.remove('scrolled');
+      }
+    });
+  });
+</script>
+
+<!-- ------  End added by developer-------- -->
+
+<div class="header header--{{ type }}"
+     data-section-type="header"
+     data-section-force-loading
+     data-section-id="{{ section.id }}">
+
+  <header class="header__wrapper" role="banner">
+    <div class="container h-100">
+      <div class="row h-100 align-items-center flex-nowrap">
+
+        <!-- left icons -->
+        <div class="{% unless type == 'hidden' %}d-lg-none {% endunless %}flex-fill text-whitespace-nowrap header__left-icons-wrapper">
+          <ul class="header-menu">
+            <li class="header-menu__item">
+              <a href="#" class="header-menu__link header-menu__link--icon js-drawer-open-button-left" aria-controls="NavDrawer" aria-label="{{ 'general.drawers.navigation' | t }}" title="{{ 'general.drawers.navigation' | t }}">
+                <span class="{{ settings.icon }}" aria-hidden="true">menu</span>
+              </a>
+            </li>
+
+            {%- render 'dbtfy-wish-list', type: 'menu' -%}
+
+            {%- if settings.enable_search -%}
+              <li class="header-menu__item">
+                <a href="/search" class="header-menu__link header-menu__link--icon js-drawer-open-button-top" aria-controls="SearchDrawer" aria-label="{{ 'general.search.title' | t }}" title="{{ 'general.search.title' | t }}">
+                  <span class="{{ settings.icon }}" aria-hidden="true">search</span>
+                </a>
+              </li>
+            {%- endif -%}
+          </ul>
+        </div>
+
+        <!-- Logo -->
+        {%- capture logo_content -%}
+          {%- liquid
+            if enable_logo_link
+              assign logo_link = routes.root_url
+            else
+              assign logo_link = '#'
+            endif
+          -%}
+
+          <a href="{{ logo_link }}" itemprop="url" class="header__logo-link h-100 d-flex align-items-center">
+            <meta itemprop="name" content="{{ shop.name }}">
+
+            <!-- default logo -->
+            {%- if logo_default != blank -%}
+              {%- assign logo_default_width = logo_width_desktop | times: 2 -%}
+              {%- capture sizes -%}{{ logo_default_width }}px{% endcapture %}
+
+              {{- logo_default | image_url: width: logo_default_width | image_tag: loading: 'eager', sizes: sizes, widths: '100,200,300', itemprop: 'logo', alt: shop.name, class: 'header__logo header__logo--default' -}}
+            {%- else -%}
+              <span class="header__logo header__logo--default text-ellipsis">{{ shop.name }}</span>
+            {%- endif -%}
+
+            <!-- inverted logo -->
+            {%- if logo_inverted != blank or logo_default != blank -%}
+              {%- capture sizes -%}{{ logo_width_desktop | times: 2 }}px{% endcapture %}
+
+              {%- if logo_inverted != blank -%}
+                {{- logo_inverted | image_url: width: logo_width_desktop | image_tag: loading: 'eager', sizes: sizes, widths: '100,200,300', alt: shop.name, class: 'header__logo header__logo--inverted' -}}
+              {%- else -%}
+                {{- logo_default | image_url: width: logo_width_desktop | image_tag: loading: 'eager', sizes: sizes, widths: '100,200,300', alt: shop.name, class: 'header__logo header__logo--inverted' -}}
+              {%- endif -%}
+            {%- else -%}
+              <span class="header__logo header__logo--inverted text-ellipsis">{{ shop.name }}</span>
+            {%- endif -%}
+
+            <!-- mobile logo -->
+            {%- if logo_mobile != blank -%}
+              {%- capture sizes -%}{{ logo_width_mobile | times: 2 }}px{% endcapture %}
+
+              {{- logo_mobile | image_url: width: logo_width_mobile | image_tag: loading: 'eager', sizes: sizes, widths: '100,200,300', alt: shop.name, class: 'header__logo header__logo--mobile' -}}
+            {%- else -%}
+              <span class="header__logo header__logo--mobile text-ellipsis">{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
+        {%- endcapture -%}
+
+        <div class="{% if type == 'center' %}flex-lg-fill col-lg-12 {% endif %}col-auto nav-containers nav-container-logo header__logo-wrapper">
+          <div class="header__menu-container">
+            {% if request.page_type == 'index' %}
+              <h1 class="header__logo-container" itemscope itemtype="http://schema.org/Organization">
+                {{ logo_content }}
+              </h1>
+            {%- else -%}
+              <div class="header__logo-container" itemscope itemtype="http://schema.org/Organization">
+                {{ logo_content }}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <!-- Navigation menu -->
+        <div class="{% if type == 'center' %}col-lg-6 {% else %}flex-lg-fill {% endif %}{% unless type == 'hidden' %}d-lg-block {% endunless %}d-none nav-containers header__menu-wrapper">
+          <ul class="header__menu-container header-menu">
+            {%- for link in linklists[menu].links -%}
+              {%- if link.links != blank -%}
+                {%- assign parent_index = forloop.index -%}
+
+                <li class="dropdown header-menu__item">
+                  <a id="MenuParentToggle-{{ parent_index }}" href="{{ link.url }}"
+                     class="dropdown__toggle header-menu__link"
+                     aria-controls="MenuParent-{{ parent_index }}"
+                     aria-haspopup="true"
+                     aria-expanded="false"
+                     {% unless request.page_type == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>
+                    {{ link.title | escape }}
+                    <span class="{{ settings.icon }}" aria-hidden="true">keyboard_arrow_down</span>
+                  </a>
+
+                  <ul id="MenuParent-{{ parent_index }}" class="dropdown__menu" aria-labelledby="MenuParentToggle-{{ parent_index }}">
+                    {%- for childlink in link.links -%}
+                      {%- if childlink.links != blank -%}
+                        {%- assign child_index = forloop.index -%}
+
+                        <!-- 2 level dropdown -->
+                        <li class="dropdown dropdown__item dropdown__item--has-grandchild">
+                          <a id="MenuChildrenToggle-{{ parent_index }}-{{ child_index }}"
+                             href="{{ childlink.url }}"
+                             class="dropdown__link dropdown__toggle{% if childlink.active %} dropdown__link--active{% endif %}"
+                             aria-controls="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                             aria-haspopup="true"
+                             aria-expanded="false"
+                             {% unless request.page_type == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless %}>
+                            {{ childlink.title | escape }}
+                          </a>
+
+                          <ul id="MenuChildren-{{ parent_index }}-{{ child_index }}" class="dropdown__menu dropdown__menu--grandchild" aria-labelledby="MenuChildrenToggle-{{ parent_index }}-{{ child_index }}">
+                            {%- for grandchildlink in childlink.links -%}
+                              <li class="dropdown__item">
+                                <a href="{{ grandchildlink.url }}"
+                                   class="dropdown__link{% if grandchildlink.active %} dropdown__link--active{% endif %}"
+                                   {% unless request.page_type == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless %}>
+                                  {{ grandchildlink.title | escape }}
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        </li>
+                      {%- else -%}
+                        <!-- 1 level dropdown -->
+                        <li class="dropdown__item">
+                          <a href="{{ childlink.url }}"
+                             class="dropdown__link{% if childlink.active %} dropdown__link--active{% endif %}"
+                             {% if childlink.active %}aria-current="page"{% endif %}>
+                            {{ childlink.title | escape }}
+                          </a>
+                        </li>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </ul>
+                </li>
+              {%- else -%}
+                <!-- only 1 link, no dropdown -->
+                <li class="header-menu__item">
+                  <a href="{{ link.url }}"
+                     class="header-menu__link"
+                     {% unless request.page_type == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>
+                    {{ link.title | escape }}
+                  </a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+
+        <!-- right icons -->
+        <div class="{% if type == 'left' or type == 'right' %}col-lg-auto {% else %}flex-lg-fill {% endif %}flex-fill text-whitespace-nowrap text-end nav-containers nav-container-right-icons header__right-icons-wrapper">
+          <ul class="header__menu-container header-menu">
+            {%- if shop.customer_accounts_enabled -%}
+              <li class="header-menu__item me-1">
+                <div class="dropdown">
+                  <button type="button"
+                          id="HeaderAccountToggle"
+                          class="dropdown__toggle localization-toggle header-menu__link header-menu__link--icon"
+                          title="{%- if customer -%}{{ 'customer.account.title' | t }}{%- else -%}{{ 'layout.customer.log_in' | t }}{%- endif -%}"
+                          aria-label="{%- if customer -%}{{ 'customer.account.title' | t }}{%- else -%}{{ 'layout.customer.log_in' | t }}{%- endif -%}"
+                          aria-controls="HeaderAccountMenu"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                    {%- if customer -%}
+                      <span class="me-2 text-sm d-none d-md-inline-block icon icon--middle">{{ customer.first_name | capitalize }}</span>
+                    {%- endif -%}
+
+                    <span class="{{ settings.icon }}" aria-hidden="true">account_circle</span>
+                  </button>
+
+                  <ul id="HeaderAccountMenu" class="dropdown__menu" aria-labelledby="HeaderAccountToggle">
+                    {%- if customer -%}
+                      <li class="dropdown__item">
+                        <a href="{{ routes.account_url }}"
+                           class="dropdown__link{% if request.path == routes.account_url %} dropdown__link--active{% endif %}"
+                           {% if request.path == routes.account_url %}aria-current="page"{% endif %}>
+                          <span class="{{ settings.icon }}">account_circle</span>
+                          {{ 'customer.account.title' | t }}
+                        </a>
+                      </li>
+
+                      <li class="dropdown__item">
+                        <a href="{{ routes.account_logout_url }}"
+                           class="dropdown__link{% if request.path == routes.account_logout_url %} dropdown__link--active{% endif %}"
+                           {% if request.path == routes.account_logout_url %}aria-current="page"{% endif %}>
+                          <span class="{{ settings.icon }}">exit_to_app</span>
+                          {{ 'layout.customer.log_out' | t }}
+                        </a>
+                      </li>
+                    {%- else -%}
+                      <li class="dropdown__item">
+                        <a href="{{ routes.account_login_url }}"
+                           class="dropdown__link{% if request.path == routes.account_login_url %} dropdown__link--active{% endif %}"
+                           {% if request.path == routes.account_login_url %}aria-current="page"{% endif %}>
+                          <span class="{{ settings.icon }}">exit_to_app</span>
+                          {{ 'layout.customer.log_in' | t }}
+                        </a>
+                      </li>
+
+                      <li class="dropdown__item">
+                        <a href="{{ routes.account_register_url }}"
+                           class="dropdown__link{% if request.path == routes.account_register_url %} dropdown__link--active{% endif %}"
+                           {% if request.path == routes.account_register_url %}aria-current="page"{% endif %}>
+                          <span class="{{ settings.icon }}">person_add</span>
+                          {{ 'layout.customer.create_account' | t }}
+                        </a>
+                      </li>
+                    {%- endif -%}
+                  </ul>
+                </div>
+              </li>
+            {%- endif -%}
+
+            {%- render 'dbtfy-wish-list', type: 'menu', class: 'd-none d-md-inline-block' -%}
+
+            {%- if settings.enable_search -%}
+              <li class="header-menu__item d-none{% if type != 'hidden' %} d-md-inline-block{% endif %}">
+                <a href="/search" class="header-menu__link header-menu__link--icon js-drawer-open-button-top" aria-controls="SearchDrawer" aria-label="{{ 'general.search.title' | t }}" title="{{ 'general.search.title' | t }}">
+                  <span class="{{ settings.icon }}" aria-hidden="true">search</span>
+                </a>
+              </li>
+            {%- endif -%}
+
+            {%- if settings.show_language_selector or settings.show_country_selector -%}
+              {%- if settings.localization_position == 'header' or settings.localization_position == 'header_and_footer' -%}
+                <li class="header-menu__item">
+                  {%- render 'localization-form', position: 'header', toggle_class: 'header-menu__link header-menu__link--icon' -%}
+                </li>
+              {%- endif -%}
+            {%- endif -%}
+
+            <li class="header-menu__item">
+              <a href="/cart" class="header-menu__link header-menu__link--icon header-menu__link--icon-cart js-drawer-open-button-right js-cart-icon" aria-controls="{%- if settings.cart_type == 'drawer' or settings.cart_type == 'page' -%}CartDrawer{%- else -%}CartModal{%- endif -%}" aria-label="{{ 'layout.cart.title' | t }}" title="{{ 'layout.cart.title' | t }}">
+                <span class="{{ settings.icon }}" aria-hidden="true">{{ settings.cart_icon }}</span>
+
+                {%- if settings.show_cart_count -%}
+                  <span class="header__cart-count cart-count">
+                    {%- if cart.item_count <= 99 -%}
+                      {{ cart.item_count }}
+                    {%- else -%}
+                      99+
+                    {%- endif -%}
+                  </span>
+                {%- endif -%}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+
+{%- render 'drawer-search' -%}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "class": "header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__1.content"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:sections.header.settings.menu.label",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "type",
+      "label": "t:sections.header.settings.type.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.header.settings.type.options__1.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.header.settings.type.options__2.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.header.settings.type.options__3.label"
+        },
+        {
+          "value": "center-logo",
+          "label": "t:sections.header.settings.type.options__4.label"
+        },
+        {
+          "value": "hidden",
+          "label": "t:sections.header.settings.type.options__5.label"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__2.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_logo_link",
+      "label": "t:sections.header.settings.enable_logo_link.label",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_default",
+      "label": "t:sections.header.settings.logo_default.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_inverted",
+      "label": "t:sections.header.settings.logo_inverted.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_mobile",
+      "label": "t:sections.header.settings.logo_mobile.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__3.content",
+      "info": "t:sections.header.settings.header__3.info"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_desktop",
+      "label": "t:sections.header.settings.logo_width_desktop.label",
+      "min": 100,
+      "max": 300,
+      "step": 2,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "label": "t:sections.header.settings.logo_width_mobile.label",
+      "min": 30,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "default": 100
+    }
+  ]
+}
+{% endschema %}
