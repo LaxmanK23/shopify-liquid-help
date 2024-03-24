@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Price Range Selector</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css" rel="stylesheet">
+<style>
+  /* Adjust styles as needed */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    position: relative; /* Ensure slider overlaps */
+  }
+
+  .close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #price-range-slider {
+    margin-bottom: 20px;
+  }
+
+  #price-range-min,
+  #price-range-max {
+    width: 50px;
+    text-align: center;
+  }
+
+  #selected-price-range {
+    margin-bottom: 10px;
+  }
+
+  .chip {
+    display: inline-block;
+    padding: 0 15px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: #f1f1f1;
+    line-height: 32px;
+  }
+
+  #clearFilterBtn {
+    background: transparent;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  #clearFilterBtn:hover {
+    color: darkred;
+  }
+
+  #selectedPriceChip {
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Modal -->
+<div id="priceRangeModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div id="selected-price-range-modal"></div>
+    <div id="price-range-slider"></div>
+    <div>
+      <label for="price-range-min">Min Price:</label>
+      <input type="text" id="price-range-min">
+      <label for="price-range-max">Max Price:</label>
+      <input type="text" id="price-range-max">
+    </div>
+  </div>
+</div>
+
+<!-- Button to open the modal -->
+<button id="openModalBtn">Select Price Range</button>
+<div id="selectedPriceChip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var priceSlider = document.getElementById('price-range-slider');
+    var minPriceInput = document.getElementById('price-range-min');
+    var maxPriceInput = document.getElementById('price-range-max');
+    var modal = document.getElementById('priceRangeModal');
+    var openModalBtn = document.getElementById('openModalBtn');
+    var closeModalSpan = document.getElementsByClassName('close')[0];
+    var selectedPriceRange = document.getElementById('selected-price-range-modal');
+    var selectedPriceChip = document.getElementById('selectedPriceChip');
+
+    noUiSlider.create(priceSlider, {
+      start: [0, 2000], // Initial range values
+      connect: true,
+      range: {
+        'min': 0,
+        'max': 2000 // Maximum possible price
+      }
+    });
+
+    // Update input values when slider values change
+    priceSlider.noUiSlider.on('update', function(values, handle) {
+      var value = values.map(Number);
+      minPriceInput.value = value[0];
+      maxPriceInput.value = value[1];
+      selectedPriceRange.innerHTML = '<span class="chip">' + value[0] + ' - ' + value[1] + ' <button id="clearFilterBtn">×</button></span>';
+      selectedPriceChip.innerHTML = '<span class="chip">' + value[0] + ' - ' + value[1] + ' <button id="clearFilterBtn">×</button></span>';
+    });
+
+    // Open modal
+    openModalBtn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    // Close modal when close button (x) is clicked
+    closeModalSpan.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // Close modal when user clicks outside of the modal
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // Function to clear filter
+    document.addEventListener('click', function(event) {
+      if (event.target && event.target.id == 'clearFilterBtn') {
+        priceSlider.noUiSlider.set([0, 2000]); // Reset slider values
+        minPriceInput.value = '';
+        maxPriceInput.value = '';
+        selectedPriceRange.innerHTML = '';
+        selectedPriceChip.innerHTML = '';
+      }
+    });
+
+    // Clear initial selection
+    document.getElementById('clearFilterBtn').click();
+  });
+</script>
+
+</body>
+</html>
